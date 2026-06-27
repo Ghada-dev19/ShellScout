@@ -33,4 +33,8 @@ assert.strictEqual(res4.explanations[1].desc, 'Source File: the source file or d
 assert.strictEqual(res4.tokens[2].type, 'destination');
 assert.strictEqual(res4.explanations[2].desc, 'Destination File: the target destination file or directory for this operation.');
 
+// Test 6: French translations (cd)
+const res5 = parseCommand('cd /home/user', 'fra');
+assert.strictEqual(res5.explanations[0].desc, 'Changer de répertoire: Utilisé pour naviguer entre les dossiers du système.');
+
 console.log('All tests passed successfully!');

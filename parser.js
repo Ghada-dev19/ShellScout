@@ -3,6 +3,8 @@ const TRANSLATIONS = {
     cmdBadge: 'Command',
     flagBadge: 'Flag',
     argBadge: 'Argument',
+    sourceBadge: 'Source File',
+    destBadge: 'Destination File',
     fallbackCmd: 'Custom or user-defined command. Please check the official man page.',
     fallbackFlag: 'Custom or command-specific option flag.',
     fallbackArg: 'Argument: value or option target passed to the command.',
@@ -16,6 +18,8 @@ const TRANSLATIONS = {
     cmdBadge: 'أمر',
     flagBadge: 'خيار',
     argBadge: 'وسيط',
+    sourceBadge: 'ملف مصدر',
+    destBadge: 'ملف هدف',
     fallbackCmd: 'أمر مخصص أو غير معروف - يرجى التحقق من الدليل الرسمي (man page).',
     fallbackFlag: 'خيار مخصص أو غير معروف للأمر المحدد.',
     fallbackArg: 'وسيط: قيمة أو ملف مستهدف ممرر للأمر.',
@@ -24,6 +28,21 @@ const TRANSLATIONS = {
     multiFlagHeader: 'تفصيل الخيارات:',
     sourceFile: 'ملف مصدر: الملف أو المجلد المصدر لهذه العملية.',
     destFile: 'ملف هدف: الملف أو المجلد الهدف لهذه العملية.'
+  },
+  fra: {
+    cmdBadge: 'Commande',
+    flagBadge: 'Option',
+    argBadge: 'Argument',
+    sourceBadge: 'Fichier source',
+    destBadge: 'Fichier cible',
+    fallbackCmd: 'Commande personnalisée. Veuillez vérifier la page de manuel officielle (man).',
+    fallbackFlag: 'Option de commande personnalisée ou spécifique.',
+    fallbackArg: 'Argument: valeur ou cible passée à la commande.',
+    targetPath: 'Chemin cible: dossier ou fichier de destination pour cette opération.',
+    archiveFile: 'Fichier archive: nom de l\'archive à créer ou extraire.',
+    multiFlagHeader: 'Détail des options:',
+    sourceFile: 'Fichier source: le fichier ou dossier source pour cette opération.',
+    destFile: 'Fichier de destination: le fichier ou dossier cible pour cette opération.'
   }
 };
 
@@ -1430,6 +1449,114 @@ function parseCommand(commandStr, lang = 'eng') {
   }
 
   return { tokens, explanations };
+}
+
+// Programmatic French Translation Helper for the database commands
+const FRENCH_COMMAND_TRANSLATIONS = {
+  'cd': { desc: 'Changer de répertoire: Utilisé pour naviguer entre les dossiers du système.', flags: {} },
+  'ls': {
+    desc: 'Lister: Liste le contenu du répertoire (fichiers et dossiers).',
+    flags: {
+      '-l': 'Format de liste longue: affiche les permissions, le propriétaire, la taille et la date.',
+      '-a': 'Tout afficher: inclut les fichiers cachés (commençant par un ".").',
+      '-la': 'Combine la liste longue (-l) et l\'affichage des fichiers cachés (-a).',
+      '-h': 'Lisible par l\'homme: affiche les tailles dans des formats faciles à lire (ex: 1K, 234M, 2G).',
+      '-R': 'Récursif: liste les sous-répertoires récursivement.',
+      '-t': 'Trier par date: trie les fichiers par date de modification, les plus récents en premier.'
+    }
+  },
+  'mkdir': {
+    desc: 'Créer un dossier: Crée un nouveau répertoire.',
+    flags: {
+      '-p': 'Parents: crée des répertoires parents si nécessaire, pas d\'erreur s\'ils existent.',
+      '-v': 'Verbeux: affiche un message pour chaque répertoire créé.'
+    }
+  },
+  'rm': {
+    desc: 'Supprimer: Utilisé pour supprimer des fichiers ou des répertoires.',
+    flags: {
+      '-r': 'Récursif: supprime les répertoires et leur contenu récursivement.',
+      '-f': 'Forcer: ignore les fichiers inexistants sans demander confirmation.',
+      '-rf': 'Suppression forcée et récursive: supprime immédiatement les dossiers et tout leur contenu.',
+      '-i': 'Interactif: demande confirmation avant chaque suppression.'
+    }
+  },
+  'pwd': { desc: 'Afficher le répertoire de travail: Affiche le chemin complet du dossier actuel.', flags: {} },
+  'cp': {
+    desc: 'Copier: Copie des fichiers ou des répertoires d\'une source vers une destination.',
+    flags: {
+      '-r': 'Récursif: copie les répertoires récursivement.',
+      '-i': 'Interactif: demande confirmation avant d\'écraser un fichier.',
+      '-p': 'Préserver: préserve les permissions, le propriétaire et les horodatages.',
+      '-v': 'Verbeux: affiche les fichiers au fur et à mesure de leur copie.'
+    }
+  },
+  'mv': {
+    desc: 'Déplacer / Renommer: Déplace des fichiers/répertoires ou les renomme.',
+    flags: {
+      '-i': 'Interactif: demande confirmation avant d\'écraser.',
+      '-f': 'Forcer: écrase sans confirmation.',
+      '-v': 'Verbeux: affiche les fichiers déplacés.'
+    }
+  },
+  'ln': {
+    desc: 'Lien: Crée des liens entre les fichiers.',
+    flags: {
+      '-s': 'Symbolique: crée un lien symbolique au lieu d\'un lien physique.',
+      '-f': 'Forcer: supprime les fichiers de destination existants.'
+    }
+  },
+  'scp': {
+    desc: 'Copie sécurisée: Copie des fichiers en toute sécurité entre hôtes réseau via SSH.',
+    flags: {
+      '-P': 'Port: spécifie le port de connexion sur l\'hôte distant.',
+      '-r': 'Récursif: copie des répertoires entiers récursivement.'
+    }
+  },
+  'rsync': {
+    desc: 'Mise en correspondance à distance: Outil rapide et polyvalent de copie et de synchronisation.',
+    flags: {
+      '-a': 'Mode archive: synchronise récursivement et préserve les attributs.',
+      '-z': 'Compresser: compresse les données des fichiers pendant le transfert.',
+      '-v': 'Verbeux: affiche des informations détaillées sur la progression.'
+    }
+  }
+};
+
+// Auto-translate other commands to French if missing
+for (const cmd in DATABASE) {
+  if (FRENCH_COMMAND_TRANSLATIONS[cmd]) {
+    DATABASE[cmd].desc.fra = FRENCH_COMMAND_TRANSLATIONS[cmd].desc;
+    for (const flag in DATABASE[cmd].flags) {
+      if (FRENCH_COMMAND_TRANSLATIONS[cmd].flags[flag]) {
+        DATABASE[cmd].flags[flag].fra = FRENCH_COMMAND_TRANSLATIONS[cmd].flags[flag];
+      } else {
+        DATABASE[cmd].flags[flag].fra = DATABASE[cmd].flags[flag].eng || 'Option personnalisée.';
+      }
+    }
+  } else {
+    let engDesc = DATABASE[cmd].desc.eng;
+    let fraDesc = engDesc
+      .replace('Create ', 'Créer ')
+      .replace('Modify ', 'Modifier ')
+      .replace('Delete ', 'Supprimer ')
+      .replace('List ', 'Lister ')
+      .replace('Print ', 'Afficher ')
+      .replace('Check ', 'Vérifier ')
+      .replace('Display ', 'Afficher ')
+      .replace('Search ', 'Rechercher ')
+      .replace('Show ', 'Afficher ')
+      .replace('Change ', 'Changer ')
+      .replace('Report ', 'Rapporter ')
+      .replace('Format ', 'Formater ')
+      .replace('Compress ', 'Compresser ')
+      .replace('Decompress ', 'Décompresser ');
+    
+    DATABASE[cmd].desc.fra = fraDesc;
+    for (const flag in DATABASE[cmd].flags) {
+      DATABASE[cmd].flags[flag].fra = DATABASE[cmd].flags[flag].eng;
+    }
+  }
 }
 
 // Export module for Node.js tests or assign global for browser use

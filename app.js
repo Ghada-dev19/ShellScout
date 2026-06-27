@@ -49,6 +49,16 @@ const UI_LABELS = {
     cmdBadge: 'أمر',
     flagBadge: 'خيار',
     argBadge: 'وسيط'
+  },
+  fra: {
+    subtitle: 'Votre guide pour comprendre simplement les commandes Linux',
+    placeholder: 'Saisissez une commande Linux (ex: ls -la)',
+    explainBtn: 'Expliquer',
+    presetsLabel: 'Commandes courantes :',
+    parsedHeader: 'Structure Analysée',
+    cmdBadge: 'Commande',
+    flagBadge: 'Option',
+    argBadge: 'Argument'
   }
 };
 
@@ -63,6 +73,7 @@ const elParsedContainer = document.getElementById('parsedCommandContainer');
 const elCardsContainer = document.getElementById('cardsContainer');
 const elBtnEng = document.getElementById('langBtnEng');
 const elBtnAra = document.getElementById('langBtnAra');
+const elBtnFra = document.getElementById('langBtnFra');
 
 function setLanguage(lang) {
   currentLanguage = lang;
@@ -75,6 +86,10 @@ function setLanguage(lang) {
   elBtnAra.classList.toggle('bg-accentBlue', lang === 'ara');
   elBtnAra.classList.toggle('text-white', lang === 'ara');
   elBtnAra.classList.toggle('text-slate-400', lang !== 'ara');
+
+  elBtnFra.classList.toggle('bg-accentBlue', lang === 'fra');
+  elBtnFra.classList.toggle('text-white', lang === 'fra');
+  elBtnFra.classList.toggle('text-slate-400', lang !== 'fra');
 
   // Update text elements
   elSubtitle.innerText = UI_LABELS[lang].subtitle;
@@ -136,9 +151,12 @@ function runExplanation(shouldScroll = false) {
     const card = document.createElement('div');
     card.id = `card-node-${idx}`;
 
-    const badgeText = expl.type === 'command' ? UI_LABELS[currentLanguage].cmdBadge :
-                      expl.type === 'flag' ? UI_LABELS[currentLanguage].flagBadge :
-                      UI_LABELS[currentLanguage].argBadge;
+    const pTranslations = window.ShellScoutParser.TRANSLATIONS[currentLanguage];
+    const badgeText = expl.type === 'command' ? pTranslations.cmdBadge :
+                      expl.type === 'flag' ? pTranslations.flagBadge :
+                      expl.type === 'source' ? pTranslations.sourceBadge :
+                      expl.type === 'destination' ? pTranslations.destBadge :
+                      pTranslations.argBadge;
 
     let borderShadowClass = '';
     let textAccentClass = '';
