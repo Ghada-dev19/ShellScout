@@ -1,5 +1,34 @@
 let currentLanguage = 'eng';
 
+function formatExplanationText(html) {
+  const parts = html.split(/(<[^>]+>)/g);
+  const formattedParts = parts.map(part => {
+    if (part.startsWith('<')) {
+      return part;
+    }
+    
+    let workingText = part;
+    let prefixSymbol = '';
+    if (workingText.startsWith(':')) {
+      prefixSymbol = ':';
+      workingText = workingText.slice(1);
+    } else if (workingText.startsWith(' :')) {
+      prefixSymbol = ' :';
+      workingText = workingText.slice(2);
+    }
+    
+    const colonIndex = workingText.indexOf(':');
+    if (colonIndex === -1) return part;
+    
+    const title = workingText.slice(0, colonIndex + 1);
+    const details = workingText.slice(colonIndex + 1);
+    if (title.trim() === '' || title.trim() === ':') return part;
+    
+    return `${prefixSymbol}<strong class="font-bold text-white text-[15px]">${title}</strong>${details}`;
+  });
+  return formattedParts.join('');
+}
+
 const UI_LABELS = {
   eng: {
     subtitle: 'Your gateway to understanding Linux commands simply',
@@ -136,7 +165,7 @@ function runExplanation(shouldScroll = false) {
         <span class="font-bold text-lg ${textAccentClass}">${badgeText} ${expl.name}</span>
       </div>
       <div class="text-sm leading-relaxed text-slate-300" style="direction: ${isRtl ? 'rtl' : 'ltr'}; text-align: ${isRtl ? 'right' : 'left'};">
-        ${expl.desc}
+        ${formatExplanationText(expl.desc)}
       </div>
     `;
     elCardsContainer.appendChild(card);
