@@ -133,8 +133,7 @@ function runExplanation(shouldScroll = false) {
     
     card.innerHTML = `
       <div class="flex justify-between items-center mb-3 font-mono" style="direction: ${isRtl ? 'rtl' : 'ltr'};">
-        <span class="font-bold text-lg ${textAccentClass}">${expl.name}</span>
-        <span class="text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full ${badgeClass}">${badgeText}</span>
+        <span class="font-bold text-lg ${textAccentClass}">${badgeText} ${expl.name}</span>
       </div>
       <div class="text-sm leading-relaxed text-slate-300" style="direction: ${isRtl ? 'rtl' : 'ltr'}; text-align: ${isRtl ? 'right' : 'left'};">
         ${expl.desc}
