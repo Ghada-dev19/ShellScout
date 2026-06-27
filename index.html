@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShellScout - Linux Command Explainer</title>
+  <!-- Google Fonts: Plus Jakarta Sans for UI, JetBrains Mono for Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandDark: '#0b0f19',
+            brandCard: '#0d1527',
+            brandBorder: '#1e293b',
+            accentBlue: '#3b82f6',
+            accentGreen: '#10b981',
+            accentOrange: '#f59e0b'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Prevent page horizontal overflow */
+    body {
+      overflow-x: hidden;
+      background-color: #0b0f19;
+    }
+  </style>
+</head>
+<body class="text-slate-100 font-sans min-h-screen relative selection:bg-accentBlue/30 selection:text-white">
+  
+  <!-- Radial Glow Background -->
+  <div class="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-accentBlue/5 to-transparent pointer-events-none z-0"></div>
+  <div class="absolute -top-40 -left-40 w-96 h-96 bg-accentBlue/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+  <div class="absolute top-60 -right-40 w-96 h-96 bg-accentGreen/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+  <!-- Main Container -->
+  <main class="max-w-4xl mx-auto px-4 py-8 relative z-10 flex flex-col min-h-screen" id="appContainer">
+    
+    <!-- SVG Canvas Overlay for Bezier Curves -->
+    <svg id="bezierCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none z-1"></svg>
+
+    <!-- Header Action / Language Toggle -->
+    <div class="flex justify-end mb-8 relative z-50">
+      <div class="bg-brandCard/80 backdrop-blur-md border border-brandBorder rounded-full p-1 flex">
+        <button id="langBtnEng" onclick="setLanguage('eng')" class="px-4 py-1.5 rounded-full text-xs font-bold font-mono transition-all duration-200">ENG</button>
+        <button id="langBtnAra" onclick="setLanguage('ara')" class="px-4 py-1.5 rounded-full text-xs font-bold font-mono transition-all duration-200">ARA</button>
+      </div>
+    </div>
+
+    <!-- Centered Intro Layout -->
+    <section class="flex flex-col items-center justify-center text-center mt-6 mb-10 relative z-10">
+      <div class="flex items-center gap-3.5 mb-4">
+        <!-- Terminal Prompt Icon -->
+        <svg class="w-12 h-12 text-accentBlue filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        <h1 class="text-4xl sm:text-5xl font-extrabold font-mono text-white tracking-tight bg-clip-text bg-gradient-to-r from-white via-white to-accentBlue/90">
+          ShellScout
+        </h1>
+      </div>
+      <p id="scSubtitle" class="text-base sm:text-lg text-slate-400 font-medium transition-all duration-300">
+        Your gateway to understanding Linux commands simply
+      </p>
+    </section>
+
+    <!-- Command Input Bar -->
+    <section class="w-full max-w-2xl mx-auto mb-6 relative z-30">
+      <div class="bg-black/40 border-2 border-brandBorder rounded-full py-1.5 pl-5 pr-1.5 flex items-center shadow-lg transition-all duration-300 focus-within:border-accentBlue focus-within:shadow-[0_0_20px_rgba(59,130,246,0.25)]">
+        <span class="text-accentBlue font-mono font-bold text-xl mr-3.5 select-none">$</span>
+        <input 
+          id="commandInput" 
+          type="text" 
+          value="tar -czvf archive.tar.gz /path/to/directory" 
+          class="flex-grow bg-transparent border-none outline-none text-slate-100 font-mono text-base placeholder-slate-600 w-full"
+          placeholder="Enter Linux command (e.g. ls -la)"
+          onkeydown="if(event.key === 'Enter') runExplanation(true)"
+        >
+        <button 
+          id="btnExplain" 
+          onclick="runExplanation(true)" 
+          class="bg-accentBlue hover:bg-blue-600 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-200 hover:shadow-[0_4px_12px_rgba(59,130,246,0.3)] flex items-center gap-2 group whitespace-nowrap text-sm"
+        >
+          <span id="txtBtnExplain">Explain</span>
+          <!-- Arrow Right Icon -->
+          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Presets Section -->
+    <section class="w-full max-w-xl mx-auto mb-12 text-center relative z-20">
+      <div id="txtPresetsLabel" class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
+        Common commands:
+      </div>
+      <div class="flex flex-wrap gap-2 justify-center">
+        <button onclick="applyPreset('cd /home/user')" class="bg-brandCard hover:bg-brandCard/40 border border-brandBorder hover:border-accentBlue/50 text-slate-400 hover:text-accentBlue font-mono text-xs px-3.5 py-1.5 rounded-full transition-all duration-200">
+          cd /home/user
+        </button>
+        <button onclick="applyPreset('ls -la')" class="bg-brandCard hover:bg-brandCard/40 border border-brandBorder hover:border-accentBlue/50 text-slate-400 hover:text-accentBlue font-mono text-xs px-3.5 py-1.5 rounded-full transition-all duration-200">
+          ls -la
+        </button>
+        <button onclick="applyPreset('mkdir -p project/src')" class="bg-brandCard hover:bg-brandCard/40 border border-brandBorder hover:border-accentBlue/50 text-slate-400 hover:text-accentBlue font-mono text-xs px-3.5 py-1.5 rounded-full transition-all duration-200">
+          mkdir -p project/src
+        </button>
+        <button onclick="applyPreset('rm -rf /tmp/scratch')" class="bg-brandCard hover:bg-brandCard/40 border border-brandBorder hover:border-accentBlue/50 text-slate-400 hover:text-accentBlue font-mono text-xs px-3.5 py-1.5 rounded-full transition-all duration-200">
+          rm -rf /tmp/scratch
+        </button>
+        <button onclick="applyPreset('pwd')" class="bg-brandCard hover:bg-brandCard/40 border border-brandBorder hover:border-accentBlue/50 text-slate-400 hover:text-accentBlue font-mono text-xs px-3.5 py-1.5 rounded-full transition-all duration-200">
+          pwd
+        </button>
+      </div>
+    </section>
+
+    <!-- Output Explanation Results Area -->
+    <section id="outputArea" class="w-full mt-4 hidden border-t border-brandBorder/60 pt-10 pb-16 relative z-10">
+      
+      <!-- Anchor target for smooth scroll -->
+      <div id="outputAnchor" class="absolute -top-6"></div>
+
+      <!-- Centered Command Visual Layout -->
+      <div class="text-center mb-16">
+        <h2 id="txtParsedHeader" class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
+          Parsed Structure
+        </h2>
+        <div id="parsedCommandContainer" class="inline-flex justify-center flex-wrap gap-x-1 gap-y-3 px-6 py-4 bg-black/40 backdrop-blur-sm rounded-xl border border-brandBorder font-mono text-xl sm:text-2xl shadow-inner relative z-10">
+          <!-- Token spans injected here -->
+        </div>
+      </div>
+
+      <!-- Explanation Cards stack -->
+      <div id="cardsContainer" class="flex flex-col gap-6 max-w-2xl mx-auto relative z-10">
+        <!-- Explanation cards injected here -->
+      </div>
+      
+    </section>
+
+  </main>
+
+  <!-- Load Parser Dictionary Core first, then Main Controller -->
+  <script src="parser.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
