@@ -24,7 +24,7 @@ function formatExplanationText(html) {
     const details = workingText.slice(colonIndex + 1);
     if (title.trim() === '' || title.trim() === ':') return part;
     
-    return `${prefixSymbol}<strong class="font-bold text-white text-[15px]">${title}</strong>${details}`;
+    return `${prefixSymbol}<strong class="font-bold">${title}</strong>${details}`;
   });
   return formattedParts.join('');
 }
