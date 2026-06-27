@@ -26,4 +26,11 @@ assert.ok(res2.explanations[1].desc.includes('Combines long listing'));
 const res3 = parseCommand('pwd', 'ara');
 assert.strictEqual(res3.explanations[0].desc, 'طباعة دليل العمل الحالي: يظهر المسار الكامل للمجلد الذي تقف فيه الآن.');
 
+// Test 5: Source vs Destination argument recognition for cp
+const res4 = parseCommand('cp file1.txt file2.txt', 'eng');
+assert.strictEqual(res4.tokens[1].type, 'source');
+assert.strictEqual(res4.explanations[1].desc, 'Source File: the source file or directory for this operation.');
+assert.strictEqual(res4.tokens[2].type, 'destination');
+assert.strictEqual(res4.explanations[2].desc, 'Destination File: the target destination file or directory for this operation.');
+
 console.log('All tests passed successfully!');

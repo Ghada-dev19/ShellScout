@@ -8,7 +8,9 @@ const TRANSLATIONS = {
     fallbackArg: 'Argument: value or option target passed to the command.',
     targetPath: 'Target Path: directory or file destination for this operation.',
     archiveFile: 'Archive File: filename of the archive to be created or extracted.',
-    multiFlagHeader: 'Option breakdown:'
+    multiFlagHeader: 'Option breakdown:',
+    sourceFile: 'Source File: the source file or directory for this operation.',
+    destFile: 'Destination File: the target destination file or directory for this operation.'
   },
   ara: {
     cmdBadge: 'أمر',
@@ -19,7 +21,9 @@ const TRANSLATIONS = {
     fallbackArg: 'وسيط: قيمة أو ملف مستهدف ممرر للأمر.',
     targetPath: 'المسار المستهدف: المجلد أو الملف الهدف لهذه العملية.',
     archiveFile: 'ملف الأرشيف: اسم ملف الأرشيف المراد التعامل معه.',
-    multiFlagHeader: 'تفصيل الخيارات:'
+    multiFlagHeader: 'تفصيل الخيارات:',
+    sourceFile: 'ملف مصدر: الملف أو المجلد المصدر لهذه العملية.',
+    destFile: 'ملف هدف: الملف أو المجلد الهدف لهذه العملية.'
   }
 };
 
@@ -1366,6 +1370,9 @@ function parseCommand(commandStr, lang = 'eng') {
   const cmdDesc = cmdEntry ? cmdEntry.desc[lang] : TRANSLATIONS[lang].fallbackCmd;
   explanations.push({ name: baseCmd, type: 'command', desc: cmdDesc, colorClass: 'color-cmd' });
 
+  let nonFlagArgCount = 0;
+  const multiArgCmds = ['cp', 'mv', 'ln', 'scp', 'rsync'];
+
   // 2. Process arguments and options
   for (let i = 1; i < parts.length; i++) {
     const part = parts[i];
@@ -1396,17 +1403,29 @@ function parseCommand(commandStr, lang = 'eng') {
 
       explanations.push({ name: part, type: 'flag', desc: flagDesc, colorClass: 'color-flag' });
     } else {
-      // Argument token
-      tokens.push({ text: part, type: 'argument', colorClass: 'color-arg' });
-
+      nonFlagArgCount++;
+      
+      let tokType = 'argument';
       let argDesc = TRANSLATIONS[lang].fallbackArg;
-      if (baseCmd === 'tar' && part.includes('.tar')) {
-        argDesc = TRANSLATIONS[lang].archiveFile;
-      } else if (part.startsWith('/') || part.includes('/') || part === 'project/src' || part === '/home/user' || part === '/tmp/scratch') {
-        argDesc = TRANSLATIONS[lang].targetPath;
+
+      if (multiArgCmds.includes(baseCmd)) {
+        if (nonFlagArgCount === 1) {
+          tokType = 'source';
+          argDesc = TRANSLATIONS[lang].sourceFile;
+        } else if (nonFlagArgCount >= 2) {
+          tokType = 'destination';
+          argDesc = TRANSLATIONS[lang].destFile;
+        }
+      } else {
+        if (baseCmd === 'tar' && part.includes('.tar')) {
+          argDesc = TRANSLATIONS[lang].archiveFile;
+        } else if (part.startsWith('/') || part.includes('/') || part === 'project/src' || part === '/home/user' || part === '/tmp/scratch') {
+          argDesc = TRANSLATIONS[lang].targetPath;
+        }
       }
 
-      explanations.push({ name: part, type: 'argument', desc: argDesc, colorClass: 'color-arg' });
+      tokens.push({ text: part, type: tokType, colorClass: 'color-arg' });
+      explanations.push({ name: part, type: tokType, desc: argDesc, colorClass: 'color-arg' });
     }
   }
 
